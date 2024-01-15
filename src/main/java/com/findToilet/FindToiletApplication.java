@@ -1,4 +1,4 @@
-package com.findtoilet;
+package com.findToilet;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
