@@ -10,7 +10,12 @@ public enum ExceptionCode {
 
     // 회원
     MEMBER_NOT_FOUND("해당 회원을 찾을 수 없습니다.", 404),
-    EMAIL_EXISTS("이미 존재하는 이메일입니다.", 409);
+    EMAIL_EXISTS("이미 존재하는 이메일입니다.", 409),
+
+    // 화장실
+
+    // API
+    JSON_FORMAT_PARSING("잘못된 JSON 포맷 입니다.", 400);
 
     @Getter
     private final String message;
