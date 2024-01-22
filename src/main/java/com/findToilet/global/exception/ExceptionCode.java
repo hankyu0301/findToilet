@@ -14,6 +14,8 @@ public enum ExceptionCode {
 
     // 화장실
 
+    TOILET_NOT_FOUND("해당 화장실을 찾을 수 없습니다.", 404),
+
     // API
     JSON_FORMAT_PARSING("잘못된 JSON 포맷 입니다.", 400);
 
