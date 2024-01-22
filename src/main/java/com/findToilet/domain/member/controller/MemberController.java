@@ -19,28 +19,24 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/api/members")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> register(@Valid @RequestBody MemberCreateRequest req) {
         memberService.register(req);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/api/members/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ResponseDto<MemberDto>> findMember(@PathVariable Long id) {
         MemberDto memberDto = memberService.readMember(id);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(memberDto));
     }
 
     @PutMapping("/api/members/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> update(@PathVariable Long id, @Valid @RequestBody MemberUpdateRequest req) {
         memberService.updateMember(id, req);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/api/members/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         memberService.deleteMember(id);
         return ResponseEntity.status(HttpStatus.OK).build();
