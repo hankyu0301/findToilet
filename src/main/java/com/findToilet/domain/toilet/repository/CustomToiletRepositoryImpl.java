@@ -6,6 +6,7 @@ import com.findToilet.domain.toilet.entity.Toilet;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -14,14 +15,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
+import static com.findToilet.domain.review.entity.QReview.review;
 import static com.findToilet.domain.toilet.entity.QToilet.toilet;
 import static com.findToilet.global.util.UserLocationCalculator.*;
 import static com.querydsl.core.types.Projections.constructor;
+import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
 public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implements CustomToiletRepository {
 
@@ -37,7 +37,7 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
         Predicate predicate = createPredicate(cond);
         List<ToiletDto> toiletDtos = fetchAll(pageable, predicate, cond);
-        Long totalCount = countTotal(predicate);
+        Long totalCount = countTotal(predicate, cond);
         return new PageImpl<>(toiletDtos, pageable, totalCount);
     }
 
@@ -72,18 +72,16 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
 
     //스프링 데이터가 제공하는 페이징을 Querydsl로 편리하게 변환
     private List<ToiletDto> fetchAll(Pageable pageable, Predicate predicate, ToiletSearchCondition cond) {
-        List<ToiletDto> toiletDtos = getQuerydsl().applyPagination(pageable, createQuery(predicate)).fetch();
-        return toiletDtos.stream()
-                .map(toiletDto -> {
-                    double distance = calculateDistance(cond.getUserLatitude(), cond.getUserLongitude(), toiletDto.getLatitude(), toiletDto.getLongitude());
-                    return distance <= cond.getDistance() ? toiletDto.withDistance(distance) : null;
-                })
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparingDouble(ToiletDto::getDistance))
-                .collect(Collectors.toList());
+        return getQuerydsl().applyPagination(pageable, createQuery(predicate, cond)).fetch();
     }
 
-    private JPQLQuery<ToiletDto> createQuery(Predicate predicate) {
+    private JPQLQuery<ToiletDto> createQuery(Predicate predicate, ToiletSearchCondition cond) {
+
+        NumberExpression<Double> distanceExpression =
+                numberTemplate(Double.class,
+                        "6371 * acos(cos(radians({0})) * cos(radians({1})) * cos(radians({2}) - radians({3})) + sin(radians({0})) * sin(radians({1})))",
+                        cond.getUserLatitude(), cond.getUserLongitude(), toilet.latitude, toilet.longitude);
+
         return jpaQueryFactory
                 .select(constructor(ToiletDto.class,
                         toilet.id,
@@ -92,16 +90,20 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
                         toilet.operation_time,
                         toilet.latitude,
                         toilet.longitude,
-                        null,
+                        distanceExpression,
                         toilet.disabled,
                         toilet.kids,
-                        toilet.diaper))
+                        toilet.diaper,
+                        review.score.coalesce((double) 0).avg().as("score"),
+                        review.count().as("scoreCount")))
                 .from(toilet)
-                .where(predicate);
+                .leftJoin(toilet.reviewList, review)
+                .where(predicate)
+                .orderBy(distanceExpression.asc());
     }
 
-    private Long countTotal(Predicate predicate) {
-        return createQuery(predicate).fetchCount();
+    private Long countTotal(Predicate predicate, ToiletSearchCondition cond) {
+        return createQuery(predicate, cond).fetchCount();
     }
 
 
