@@ -69,7 +69,8 @@ dependencies {
     //restDoc + swagger
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    //implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -109,7 +110,7 @@ openapi3 {
     ]
     title = "FindToilet API 문서"
     // description = "Spring REST Docs with SwaggerUI."
-    description = "admin: JWTTOKEN"
+    description = "admin jwt"
     version = "0.0.1"
     outputFileNamePrefix = 'open-api-3.0.1'
     format = 'json'
