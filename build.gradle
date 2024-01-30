@@ -1,5 +1,11 @@
 buildscript {
     ext {
+        restdocsApiSpecVersion = '0.15.1'
+    }
+}
+
+buildscript {
+    ext {
         queryDslVersion = "5.0.0"
     }
 }
@@ -9,6 +15,8 @@ plugins {
     id 'org.springframework.boot' version '2.7.6'
     id 'io.spring.dependency-management' version '1.1.4'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'com.findToilet'
@@ -28,6 +36,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -40,10 +52,25 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation group: 'org.json', name: 'json', version: '20090211'
+
+    //excel
     implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+
+    //queryDSL
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    //jwt
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
+    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
+
+    //restDoc + swagger
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
@@ -55,8 +82,40 @@ dependencies {
 }
 
 tasks.named('test') {
+    outputs.dir snippetsDir
     useJUnitPlatform()
 }
+
+tasks.withType(GenerateSwaggerUI) {
+    dependsOn 'openapi3'
+
+    delete file('src/main/resources/static/docs/')
+    copy {
+        from "build/resources/main/static/docs"
+        into "src/main/resources/static/docs/"
+    }
+}
+
+
+bootJar {
+    dependsOn(':openapi3')
+    archiveVersion = "0.0.0"
+}
+
+openapi3 {
+    servers = [
+            {url = 'https://teamdev.shop'},
+            {url = 'https://localhost:8080'}
+    ]
+    title = "FindToilet API 문서"
+    // description = "Spring REST Docs with SwaggerUI."
+    description = "admin: JWTTOKEN"
+    version = "0.0.1"
+    outputFileNamePrefix = 'open-api-3.0.1'
+    format = 'json'
+    outputDirectory = 'build/resources/main/static/docs'
+}
+
 
 def querydslDir = "$buildDir/generated/querydsl"
 
