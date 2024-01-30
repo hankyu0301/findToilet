@@ -10,7 +10,9 @@ import com.findToilet.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -37,6 +39,7 @@ public class MemberService {
         }
     }
 
+    @Transactional(readOnly = true)
     public MemberDto readMember(Long id) {
         Member member = memberRepository.findById(id).orElseThrow(() -> new CustomException(ExceptionCode.MEMBER_NOT_FOUND));
         return MemberDto.of(member);
