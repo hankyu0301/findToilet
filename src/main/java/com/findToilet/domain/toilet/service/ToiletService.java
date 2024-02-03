@@ -6,20 +6,21 @@ import com.findToilet.domain.toilet.repository.ToiletRepository;
 import com.findToilet.global.exception.CustomException;
 import com.findToilet.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class ToiletService {
 
     private final ToiletRepository toiletRepository;
 
+    @Transactional(readOnly = true)
     public ToiletListDto findAllByCondition(ToiletSearchCondition cond) {
         return ToiletListDto.toDto(toiletRepository.findAllByCondition(cond));
     }
 
-    //위도, 경도는 API를 사용해서 받아올까?
     public void create(ToiletCreateRequest req) {
         Toilet toilet = Toilet.builder()
                 .name(req.getName())
@@ -34,6 +35,7 @@ public class ToiletService {
         toiletRepository.save(toilet);
     }
 
+    @Transactional(readOnly = true)
     public ToiletDto read(Long id) {
         return ToiletDto.toDto(toiletRepository.findById(id).orElseThrow(() -> new CustomException(ExceptionCode.TOILET_NOT_FOUND)));
     }
