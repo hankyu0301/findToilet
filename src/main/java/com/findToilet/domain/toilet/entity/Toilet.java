@@ -1,11 +1,12 @@
 package com.findToilet.domain.toilet.entity;
 
+import com.findToilet.domain.review.entity.Review;
 import com.findToilet.global.audit.BaseEntity;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Builder
@@ -41,6 +42,9 @@ public class Toilet extends BaseEntity {
 
     private String operation_time; // 개방 시간 (제공하지 않는 곳도 있음) 09~18시, 상시, 6~22시, 05~25시, 0~24시, 09:00~18:00 등 멋대로임) 포맷팅 해서 제공해야할듯
 
+    @OneToMany(mappedBy = "toilet")
+    private List<Review> reviewList = new ArrayList<>();
+
     public void update(String name, String road_address, String address, boolean disabled, boolean kids, boolean diaper, String operation_time) {
         this.name = name;
         this.road_address = road_address;
@@ -48,5 +52,6 @@ public class Toilet extends BaseEntity {
         this.disabled = disabled;
         this.kids = kids;
         this.diaper = diaper;
+        this.operation_time = operation_time;
     }
 }
