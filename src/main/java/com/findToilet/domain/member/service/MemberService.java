@@ -29,7 +29,7 @@ public class MemberService {
         return Member.builder()
                 .email(req.getEmail())
                 .password(passwordEncoder.encode(req.getPassword()))
-                .nickname(req.getPassword())
+                .nickname(req.getNickname())
                 .build();
     }
 
