@@ -1,11 +1,6 @@
 buildscript {
     ext {
         restdocsApiSpecVersion = '0.15.1'
-    }
-}
-
-buildscript {
-    ext {
         queryDslVersion = "5.0.0"
     }
 }
@@ -44,14 +39,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.session:spring-session-data-redis'
-    implementation group: 'org.json', name: 'json', version: '20090211'
+    implementation('com.github.openjson:openjson:1.0.12')
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'com.google.code.gson:gson'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation group: 'org.json', name: 'json', version: '20090211'
 
     //excel
     implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
@@ -69,8 +63,8 @@ dependencies {
     //restDoc + swagger
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
-    //implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    //implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -105,7 +99,6 @@ bootJar {
 
 openapi3 {
     servers = [
-            {url = 'https://teamdev.shop'},
             {url = 'https://localhost:8080'}
     ]
     title = "FindToilet API 문서"
