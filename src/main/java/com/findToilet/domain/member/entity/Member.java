@@ -1,6 +1,5 @@
 package com.findToilet.domain.member.entity;
 
-import com.findToilet.domain.oauth.entity.KakaoToken;
 import com.findToilet.global.audit.BaseEntity;
 import lombok.*;
 
@@ -29,9 +28,6 @@ public class Member extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(length = 32, columnDefinition = "varchar(32) default 'ROLE_USER'")
     private Role role;
-
-    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE)
-    private KakaoToken kakaoToken;
 
     @Getter
     public enum Role {

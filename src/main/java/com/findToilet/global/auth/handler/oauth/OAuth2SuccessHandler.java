@@ -2,10 +2,8 @@ package com.findToilet.global.auth.handler.oauth;
 
 import com.findToilet.domain.member.entity.Member;
 import com.findToilet.domain.member.repository.MemberRepository;
-import com.findToilet.domain.oauth.service.KakaoTokenOauthService;
 import com.findToilet.global.auth.jwt.DelegateTokenUtil;
 import com.findToilet.global.auth.jwt.JwtTokenizer;
-import com.findToilet.global.auth.userdetails.MemberDetails;
 import com.findToilet.global.auth.userdetails.OAuthAttributes;
 import com.findToilet.global.auth.utils.OAuth2TokenUtils;
 import com.findToilet.global.exception.CustomException;
@@ -32,7 +30,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final MemberRepository memberRepository;
     private final JwtTokenizer jwtTokenizer;
     private final OAuth2TokenUtils oAuth2TokenUtils;
-    private final KakaoTokenOauthService kakaoTokenOauthService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -46,7 +43,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         if (oAuth2TokenUtils.getOAuthRegistration(oAuth2AuthorizedClient).equals("kakao")) {
             String accessTokenValue = oAuth2TokenUtils.getOAuthAccessToken(oAuth2AuthorizedClient);
             String refreshTokenValue = oAuth2TokenUtils.getOAuthRefreshToken(oAuth2AuthorizedClient);
-            kakaoTokenOauthService.saveOrUpdateToken(accessTokenValue, refreshTokenValue, findMember);
         }
         redirect(request, response, findMember);
     }

@@ -2,7 +2,6 @@
 package com.findToilet.global.auth.userdetails;
 import com.findToilet.domain.member.entity.Member;
 import com.findToilet.domain.member.repository.MemberRepository;
-import com.findToilet.domain.oauth.service.KakaoApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,7 +18,6 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
-    private final KakaoApiService kakaoApiService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,7 +36,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (optionalMember.isEmpty()) {
             Member member = oauthAttributesToMember(attributes);
             memberRepository.save(member);
-            kakaoApiService.sendWelcomeMessage(member, accessToken);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.findToilet.global.config;
 
 import com.findToilet.domain.member.repository.MemberRepository;
-import com.findToilet.domain.oauth.service.KakaoTokenOauthService;
 import com.findToilet.global.auth.handler.login.MemberAuthenticationEntryPoint;
 import com.findToilet.global.auth.handler.logout.MemberLogoutHandler;
 import com.findToilet.global.auth.handler.logout.MemberLogoutSuccessHandler;
@@ -19,7 +18,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -42,7 +40,6 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final RedisUtils redisUtils;
     private final OAuth2TokenUtils oAuth2TokenUtils;
-    private final KakaoTokenOauthService kakaoTokenOauthService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,7 +66,7 @@ public class SecurityConfig {
                         .and()
                         .successHandler(
                                 new OAuth2SuccessHandler(delegateTokenUtil, memberRepository, jwtTokenizer,
-                                        oAuth2TokenUtils, kakaoTokenOauthService)))
+                                        oAuth2TokenUtils)))
                 .apply(customFilterConfigurers())
                 .and()
                 .authorizeHttpRequests(authorize -> authorize
