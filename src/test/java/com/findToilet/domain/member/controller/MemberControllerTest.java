@@ -2,8 +2,8 @@ package com.findToilet.domain.member.controller;
 
 import com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.findToilet.domain.member.dto.MemberCreateRequest;
+import com.findToilet.domain.member.dto.MemberDto;
 import com.findToilet.domain.member.dto.MemberUpdateRequest;
 import com.findToilet.domain.member.entity.Member;
 import com.findToilet.domain.member.repository.MemberRepository;
@@ -13,7 +13,6 @@ import com.findToilet.global.auth.jwt.JwtTokenizer;
 import com.findToilet.helper.StubData;
 import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,13 +23,17 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -44,8 +47,6 @@ public class MemberControllerTest {
     private Gson gson;
     @MockBean
     private MemberService service;
-
-    ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private MemberRepository repository;
@@ -135,7 +136,37 @@ public class MemberControllerTest {
                                                 .build())));
     }
 
+    @Test
+    @DisplayName("회원정보를 조회한다.")
+    void readMember() throws Exception {
+        MemberDto dto = MemberDto.of(Member.builder().id(1L).nickname("finebears").email("finebears@naver.com").role(Member.Role.USER).build());
+        given(service.readMember(anyLong())).willReturn(dto);
 
+        //when
+        ResultActions actions = mockMvc.perform(
+                        get(MEMBER_DEFAULT_URI + "/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
+                //then
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(dto.getId()))
+                .andDo(
+                        MockMvcRestDocumentationWrapper.document("회원 조회 예제",
+                                preprocessRequest(prettyPrint()),
+                                preprocessResponse(prettyPrint()),
+                                resource(
+                                        ResourceSnippetParameters.builder()
+                                                .tag("Member")
+                                                .description("회원 조회")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
+                                                .responseFields(
+                                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
+                                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                                        fieldWithPath("data.role").type(JsonFieldType.STRING).description("회원 권한"))
+                                                .build())));
+    }
 
     @Test
     @DisplayName("회원정보를 수정한다.")
@@ -173,7 +204,7 @@ public class MemberControllerTest {
     @DisplayName("회원을 탈퇴한다.")
     void deleteMember() throws Exception {
         //given
-        doNothing().when(service).deleteMember(Mockito.anyLong());
+        doNothing().when(service).deleteMember(anyLong());
 
         //when
         mockMvc.perform(
