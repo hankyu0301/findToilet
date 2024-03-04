@@ -1,10 +1,10 @@
 package com.findToilet.domain.toilet.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ToiletCreateRequest {
@@ -20,6 +20,8 @@ public class ToiletCreateRequest {
     private Double longitude;
 
     private boolean disabled; // 장애인용 대변기가 구비되어 있는지?
+
+    private boolean kids; // 장애인용 대변기가 구비되어 있는지?
 
     private boolean diaper; // 기저귀 교환대가 있는지? (남자에만 있고 여자에는 없고 이런 곳도 있는듯)
 

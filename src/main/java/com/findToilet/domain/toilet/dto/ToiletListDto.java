@@ -1,12 +1,13 @@
 package com.findToilet.domain.toilet.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ToiletListDto {
     private Long totalElements;

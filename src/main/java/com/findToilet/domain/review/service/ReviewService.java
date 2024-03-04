@@ -46,8 +46,8 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewDto> readAll(ReviewReadCondition cond) {
-        List<Review> reviewList = reviewRepository.findByToiletId(cond.getToiletId());
+    public List<ReviewDto> readAll(Long toiletId) {
+        List<Review> reviewList = reviewRepository.findByToiletId(toiletId);
         return reviewList.stream().map(ReviewDto::of).collect(Collectors.toList());
     }
 

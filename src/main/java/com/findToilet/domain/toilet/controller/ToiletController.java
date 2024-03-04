@@ -17,7 +17,7 @@ public class ToiletController {
     private final ToiletService toiletService;
 
     @GetMapping("/api/toilets")
-    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByCondition(@Valid ToiletSearchCondition toiletSearchCondition) {
+    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByCondition(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
         ToiletListDto toiletListDto = toiletService.findAllByCondition(toiletSearchCondition);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletListDto));
     }
@@ -35,14 +35,12 @@ public class ToiletController {
     }
 
     @PutMapping("/api/toilets/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> update(@PathVariable Long id, @Valid @RequestBody ToiletUpdateRequest req) {
         toiletService.update(id, req);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/api/toilets/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> delete(@PathVariable Long id) {
         toiletService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).build();

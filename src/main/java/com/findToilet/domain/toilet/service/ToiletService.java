@@ -29,6 +29,7 @@ public class ToiletService {
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
                 .disabled(req.isDisabled())
+                .kids(req.isKids())
                 .diaper(req.isDiaper())
                 .operation_time(req.getOperation_time())
                 .build();

@@ -1,10 +1,10 @@
 package com.findToilet.domain.toilet.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ToiletUpdateRequest {

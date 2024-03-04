@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class MemberControllerTest {
+class MemberControllerTest {
     private final String MEMBER_DEFAULT_URI = "/api/members";
 
     @Autowired

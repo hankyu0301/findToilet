@@ -1,14 +1,15 @@
 package com.findToilet.domain.review.dto;
 
 import com.findToilet.domain.review.entity.Review;
-import com.findToilet.domain.toilet.dto.ToiletDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReviewDto {
@@ -17,9 +18,8 @@ public class ReviewDto {
     private String content;
     private Double score;
     private LocalDateTime createdAt;
-    private LocalDateTime modifiedAt;
 
-    private ToiletDto toiletDto;
+    private Long toiletId;
 
     private String memberNickname;
 
@@ -28,8 +28,7 @@ public class ReviewDto {
                 review.getContent(),
                 review.getScore(),
                 review.getCreatedAt(),
-                review.getModifiedAt(),
-                ToiletDto.toDto(review.getToilet()),
+                review.getToilet().getId(),
                 review.getMember().getNickname());
     }
 

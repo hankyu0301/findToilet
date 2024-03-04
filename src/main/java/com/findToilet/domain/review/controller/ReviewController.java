@@ -26,9 +26,9 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/api/reviews")
-    public ResponseEntity<ResponseDto<List<ReviewDto>>> readAll(@Valid ReviewReadCondition cond) {
-        List<ReviewDto> reviewList = reviewService.readAll(cond);
+    @GetMapping("/api/reviews/{toiletId}")
+    public ResponseEntity<ResponseDto<List<ReviewDto>>> readAll(@PathVariable Long toiletId) {
+        List<ReviewDto> reviewList = reviewService.readAll(toiletId);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(reviewList));
     }
 
