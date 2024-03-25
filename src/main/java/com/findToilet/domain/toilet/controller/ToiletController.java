@@ -1,6 +1,7 @@
 package com.findToilet.domain.toilet.controller;
 
 import com.findToilet.domain.toilet.dto.*;
+import com.findToilet.domain.toilet.dto.ToiletReadResponseDto;
 import com.findToilet.domain.toilet.service.ToiletService;
 import com.findToilet.global.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -29,9 +30,9 @@ public class ToiletController {
     }
 
     @GetMapping("/api/toilets/{id}")
-    public ResponseEntity<ResponseDto<ToiletDto>> read(@PathVariable Long id) {
-        ToiletDto toiletDto = toiletService.read(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletDto));
+    public ResponseEntity<ResponseDto<ToiletReadResponseDto>> read(@PathVariable Long id) {
+        ToiletReadResponseDto result = toiletService.read(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(result));
     }
 
     @PutMapping("/api/toilets/{id}")

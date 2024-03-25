@@ -48,12 +48,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     //excel
-    implementation group: 'org.apache.poi', name: 'poi', version: '3.9'
-    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
+    implementation group: 'org.apache.poi', name: 'poi', version: '4.1.0'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.1.0'
+    implementation group: 'org.json', name: 'json', version: '20090211'
 
     //queryDSL
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    implementation 'org.hibernate:hibernate-spatial'
+    runtimeOnly 'com.mysql:mysql-connector-j' // MySQL 드라이버
 
     //jwt
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'

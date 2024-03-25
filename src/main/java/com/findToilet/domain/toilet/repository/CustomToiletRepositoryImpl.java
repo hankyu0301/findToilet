@@ -5,8 +5,7 @@ import com.findToilet.domain.toilet.dto.ToiletSearchCondition;
 import com.findToilet.domain.toilet.entity.Toilet;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -19,7 +18,6 @@ import java.util.List;
 
 import static com.findToilet.domain.review.entity.QReview.review;
 import static com.findToilet.domain.toilet.entity.QToilet.toilet;
-import static com.findToilet.global.util.UserLocationCalculator.*;
 import static com.querydsl.core.types.Projections.constructor;
 import static com.querydsl.core.types.dsl.Expressions.numberTemplate;
 
@@ -43,27 +41,31 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
 
     private Predicate createPredicate(ToiletSearchCondition cond) {
         return new BooleanBuilder()
-                .and(locationExpression(cond))
+                .and(distanceLt(cond.getUserLongitude(), cond.getUserLatitude(), cond.getLimit()))
                 .and(disabledEq(cond.isDisabled()))
                 .and(kidsEq(cond.isKids()))
                 .and(diaperEq(cond.isDiaper()));
     }
 
-    /*  사용자의 위치정보를 기준으로 distance 내에 있는 화장실을 탐색합니다.
-    * */
-    private BooleanExpression locationExpression(ToiletSearchCondition cond) {
-
-        return toilet.latitude.between(getLatitudeMinus(cond.getUserLatitude(), cond.getDistance()), getLatitudePlus(cond.getUserLatitude(), cond.getDistance()))
-                .and(toilet.longitude.between(getLongitudeMinus(cond.getUserLongitude(), cond.getDistance()), getLongitudePlus(cond.getUserLongitude(), cond.getDistance())));
-
+    private BooleanExpression distanceLt(Double userLongitude, Double userLatitude, Double limit) {
+        return Expressions.stringTemplate("ST_Distance_Sphere({0}, {1})",
+                Expressions.stringTemplate("POINT({0}, {1})",
+                        userLongitude,
+                        userLatitude
+                ),
+                Expressions.stringTemplate("POINT({0}, {1})",
+                        toilet.longitude,
+                        toilet.latitude
+                )).loe(String.valueOf(limit));
     }
 
+
     private BooleanExpression disabledEq(boolean disabled) {
-        return disabled ? toilet.disabled.isTrue() : null;
+        return disabled ? (toilet.male_disabled.isTrue().and(toilet.female_disabled.isTrue())) : null;
     }
 
     private BooleanExpression kidsEq(boolean kids) {
-        return kids ? toilet.kids.isTrue() : null;
+        return kids ? (toilet.male_kids.isTrue().and(toilet.female_kids.isTrue())) : null;
     }
 
     private BooleanExpression diaperEq(boolean diaper) {
@@ -77,10 +79,6 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
 
     private JPQLQuery<ToiletDto> createQuery(Predicate predicate, ToiletSearchCondition cond) {
 
-        NumberExpression<Double> distanceExpression =
-                numberTemplate(Double.class,
-                        "6371 * acos(cos(radians({0})) * cos(radians({1})) * cos(radians({2}) - radians({3})) + sin(radians({0})) * sin(radians({1})))",
-                        cond.getUserLatitude(), cond.getUserLongitude(), toilet.latitude, toilet.longitude);
 
         return jpaQueryFactory
                 .select(constructor(ToiletDto.class,
@@ -90,16 +88,24 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
                         toilet.operation_time,
                         toilet.latitude,
                         toilet.longitude,
-                        distanceExpression,
-                        toilet.disabled,
-                        toilet.kids,
+                        getDistance(toilet.longitude, toilet.latitude, cond.getUserLongitude(), cond.getUserLatitude()),
+                        toilet.male_disabled.and(toilet.female_disabled).as("disabled"),
+                        toilet.male_kids.and(toilet.female_kids).as("kids"),
                         toilet.diaper,
                         review.score.coalesce((double) 0).avg().as("score"),
                         review.count().as("scoreCount")))
                 .from(toilet)
                 .leftJoin(toilet.reviewList, review)
                 .where(predicate)
-                .orderBy(distanceExpression.asc());
+                .orderBy(getDistance(toilet.longitude, toilet.latitude, cond.getUserLongitude(), cond.getUserLatitude()).asc());
+    }
+
+    private NumberTemplate<Double> getDistance(NumberPath<Double> longitude, NumberPath<Double> latitude, Double userLongitude, Double userLatitude) {
+        return numberTemplate(Double.class, "ST_Distance_Sphere(POINT({0}, {1}), POINT({2}, {3}))",
+                userLongitude,
+                userLatitude,
+                longitude,
+                latitude);
     }
 
     private Long countTotal(Predicate predicate, ToiletSearchCondition cond) {

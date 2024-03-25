@@ -4,7 +4,6 @@ import com.findToilet.domain.member.entity.Member;
 import com.findToilet.domain.member.repository.MemberRepository;
 import com.findToilet.domain.review.dto.ReviewCreateRequest;
 import com.findToilet.domain.review.dto.ReviewDto;
-import com.findToilet.domain.review.dto.ReviewReadCondition;
 import com.findToilet.domain.review.entity.Review;
 import com.findToilet.domain.review.repository.ReviewRepository;
 import com.findToilet.domain.toilet.entity.Toilet;
@@ -31,8 +30,11 @@ public class ReviewService {
 
     public void create(ReviewCreateRequest req) {
 
-        Toilet toilet = toiletRepository.findById(req.getToiletId()).orElseThrow(() -> new CustomException(ExceptionCode.TOILET_NOT_FOUND));
-        Member member = memberRepository.findById(getMemberId()).orElseThrow(() -> new CustomException(ExceptionCode.MEMBER_NOT_FOUND));
+        Toilet toilet = toiletRepository.findById(req.getToiletId())
+                .orElseThrow(() -> new CustomException(ExceptionCode.TOILET_NOT_FOUND));
+
+        Member member = memberRepository.findById(getMemberId())
+                .orElseThrow(() -> new CustomException(ExceptionCode.MEMBER_NOT_FOUND));
 
         //지금 로그인한 회원의 정보가 필요함
         Review review = Review.builder()

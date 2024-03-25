@@ -36,7 +36,7 @@ public class ChangeByGeocoderKakao implements ReverseGeocoding {
         if (jsonObject.getJSONArray("documents").isNull(0)) {
             AddressInfoDto nullAddressInfoDto = AddressInfoDto.builder()
                     .address(address)
-                    .address_detail("")
+                    .road_address("")
                     .longitude(0.0)
                     .latitude(0.0)
                     .build();
@@ -81,10 +81,10 @@ public class ChangeByGeocoderKakao implements ReverseGeocoding {
     private CoordinateInfoDto getCoordinateInfoDto(JSONObject document) throws JSONException {
         JSONObject road_address = document.getJSONObject("road_address");
         String address_name = (String)road_address.get("address_name");
-        String address_detail = (String)road_address.get("building_name");
+        String building_name = (String)road_address.get("building_name");
         CoordinateInfoDto nullCoordinateInfoDto = CoordinateInfoDto.builder()
                 .address_name(address_name)
-                .address_detail(address_detail)
+                .address_detail(building_name)
                 .build();
         return nullCoordinateInfoDto;
     }
@@ -93,16 +93,16 @@ public class ChangeByGeocoderKakao implements ReverseGeocoding {
         Double longitude = Double.valueOf(((String)document.get("x")));
         Double latitude = Double.valueOf(((String)document.get("y")));
         String address_name = (String)document.get("address_name");
-        String address_detail = null;
+        String road_address_name = "";
         if (!document.isNull("road_address")) {
             JSONObject road_address = document.getJSONObject("road_address");
-            address_detail = (String)road_address.get("building_name");
+            road_address_name = (String)road_address.get("address_name");
         }
         AddressInfoDto addressInfoDto = AddressInfoDto.builder()
                 .latitude(latitude)
                 .longitude(longitude)
                 .address(address_name)
-                .address_detail(address_detail)
+                .road_address(road_address_name)
                 .build();
         return addressInfoDto;
     }

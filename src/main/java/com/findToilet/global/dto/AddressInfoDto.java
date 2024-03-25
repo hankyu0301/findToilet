@@ -15,6 +15,6 @@ public class AddressInfoDto {
     Double latitude;
     Double longitude;
     String address;
-    String address_detail;
+    String road_address;
 
 }

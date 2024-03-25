@@ -13,7 +13,7 @@ public class ToiletListDto {
     private Long totalElements;
     private Integer totalPages;
     private boolean hasNext;
-    private List<ToiletDto> postList;
+    private List<ToiletDto> toiletDtoList;
 
     public static ToiletListDto toDto(Page<ToiletDto> page) {
         return new ToiletListDto(page.getTotalElements(), page.getTotalPages(), page.hasNext(), page.getContent());

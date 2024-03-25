@@ -22,21 +22,29 @@ public class Toilet extends BaseEntity {
     @Column(nullable = false)
     private String name; // 화장실 이름 (ex: 중동공원, 1호문화공원)
 
+    @Column(nullable = false)
     private String road_address; // 도로명 주소
 
+    @Column(nullable = false)
     private String address; // 지번 주소
 
     @Column(nullable = false)
-    private Double latitude;
+    private Double latitude; // 위도
 
     @Column(nullable = false)
-    private Double longitude;
+    private Double longitude; // 경도
 
     @Column(nullable = false)
-    private boolean disabled; // 장애인 이용 가능 시설인지?
+    private boolean male_disabled; // 장애인 이용 가능 시설인지?
 
     @Column(nullable = false)
-    private boolean kids;   //  유아용 대,소변기 유무
+    private boolean female_disabled;
+
+    @Column(nullable = false)
+    private boolean male_kids;   //  유아용 대,소변기 유무
+
+    @Column(nullable = false)
+    private boolean female_kids;
 
     @Column(nullable = false)
     private boolean diaper; // 기저귀 교환대가 있는지? (남자에만 있고 여자에는 없고 이런 곳도 있는듯)
@@ -46,13 +54,25 @@ public class Toilet extends BaseEntity {
     @OneToMany(mappedBy = "toilet")
     private List<Review> reviewList = new ArrayList<>();
 
-    public void update(String name, String road_address, String address, boolean disabled, boolean kids, boolean diaper, String operation_time) {
+    public Toilet(String name, String road_address, String address, Double latitude, Double longitude, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time) {
         this.name = name;
         this.road_address = road_address;
         this.address = address;
-        this.disabled = disabled;
-        this.kids = kids;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.male_disabled = male_disabled;
+        this.female_disabled = female_disabled;
+        this.male_kids = male_kids;
+        this.female_kids = female_kids;
         this.diaper = diaper;
         this.operation_time = operation_time;
     }
+
+    public void update(String name, String road_address, String address, String operation_time) {
+        this.name = name;
+        this.road_address = road_address;
+        this.address = address;
+        this.operation_time = operation_time;
+    }
+
 }
