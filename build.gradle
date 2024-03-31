@@ -102,7 +102,7 @@ bootJar {
 
 openapi3 {
     servers = [
-            {url = 'https://localhost:8080'}
+            {url = 'http://localhost:8080'}
     ]
     title = "FindToilet API 문서"
     // description = "Spring REST Docs with SwaggerUI."

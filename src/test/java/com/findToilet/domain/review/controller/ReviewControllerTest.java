@@ -8,7 +8,10 @@ import com.findToilet.domain.review.dto.ReviewDto;
 import com.findToilet.domain.review.entity.Review;
 import com.findToilet.domain.review.service.ReviewService;
 import com.findToilet.domain.toilet.entity.Toilet;
+import com.findToilet.global.auth.jwt.JwtTokenizer;
+import com.findToilet.helper.StubData;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +31,7 @@ import java.util.List;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -50,6 +55,15 @@ class ReviewControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String accessTokenForUser;
+
+    @Autowired
+    private JwtTokenizer jwtTokenizer;
+    @BeforeAll
+    public void init() {
+        accessTokenForUser = StubData.MockSecurity.getValidAccessToken(jwtTokenizer.getSecretKey());
+    }
+
     @Test
     @DisplayName("리뷰를 작성한다.")
     void createReview() throws Exception {
@@ -63,7 +77,8 @@ class ReviewControllerTest {
         mockMvc.perform(
                         post(REVIEW_DEFAULT_URI)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonData))
+                                .content(jsonData)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
                 //then
                 .andExpect(status().isCreated())
                 .andDo(
@@ -74,6 +89,8 @@ class ReviewControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Review")
                                                 .description("리뷰 등록")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .requestFields(
                                                         fieldWithPath("content").type(JsonFieldType.STRING).description("내용"),
                                                         fieldWithPath("score").type(JsonFieldType.NUMBER).description("별점"),
@@ -91,7 +108,8 @@ class ReviewControllerTest {
 
         //when
         mockMvc.perform(
-                        get(REVIEW_DEFAULT_URI + "/{id}", 1L))
+                        get(REVIEW_DEFAULT_URI + "/{id}", 1L)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
                 //then
                 .andExpect(status().isOk())
                 .andDo(
@@ -102,6 +120,8 @@ class ReviewControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Review")
                                                 .description("리뷰 조회")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .requestFields()
                                                 .responseFields(
                                                         List.of(fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("리뷰 식별자"),
@@ -122,7 +142,8 @@ class ReviewControllerTest {
         //when
         mockMvc.perform(
                         delete(REVIEW_DEFAULT_URI + "/{id}", 1L)
-                                .contentType(MediaType.APPLICATION_JSON))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
                 //then
                 .andExpect(status().isOk())
                 .andDo(
@@ -133,6 +154,8 @@ class ReviewControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Review")
                                                 .description("리뷰 삭제")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .requestFields()
                                                 .responseFields()
                                                 .build())));

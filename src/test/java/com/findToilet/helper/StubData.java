@@ -27,7 +27,26 @@ public class StubData {
             Map<String, Object> claims = new HashMap<>();
             claims.put("email", "test@test.com");
             claims.put("memberId", 1);
-            claims.put("roles", List.of("USER"));
+            claims.put("roles", List.of("ROLE_USER"));
+
+            String subject = "test token";
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 1);
+            Date expiration = calendar.getTime();
+
+            String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(secretKey);
+
+            String accessToken = jwtTokenizer.generateAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+
+            return accessToken;
+        }
+
+        public static String getValidAdminAccessToken(String secretKey) {
+            JwtTokenizer jwtTokenizer = new JwtTokenizer();
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("email", "test@test.com");
+            claims.put("memberId", 1);
+            claims.put("roles", List.of("ROLE_ADMIN"));
 
             String subject = "test token";
             Calendar calendar = Calendar.getInstance();

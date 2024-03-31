@@ -14,8 +14,10 @@ import com.findToilet.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,6 +42,18 @@ public class SecurityConfig {
     private final MemberRepository memberRepository;
     private final RedisUtils redisUtils;
     private final OAuth2TokenUtils oAuth2TokenUtils;
+
+    public static final String[] PUBLIC_URLS = {
+            "/api/members", "/api/members/login"
+    };
+
+    public static final String[] PRIVATE_URLS = {
+            "/api/reviews/**", "/api/members/**",  "/api/toilets/**"
+    };
+
+    public static final String[] ADMIN_URLS = {
+            "/api/toilets/**"
+    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,8 +83,14 @@ public class SecurityConfig {
                                         oAuth2TokenUtils)))
                 .apply(customFilterConfigurers())
                 .and()
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll());
+
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .antMatchers(PUBLIC_URLS).permitAll()
+                                .antMatchers(HttpMethod.DELETE, ADMIN_URLS).hasRole("ADMIN")
+                                .antMatchers(PRIVATE_URLS).authenticated()
+                                .anyRequest().authenticated()
+                );
 
         return http.build();
     }
@@ -78,6 +98,11 @@ public class SecurityConfig {
     @Bean
     public CustomFilterConfig customFilterConfigurers() {
         return new CustomFilterConfig(jwtTokenizer, delegateTokenUtil, accessTokenRenewalUtil, redisUtils);
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/exception/**", "/docs/**","/v3/api-docs/**");
     }
 
     @Bean

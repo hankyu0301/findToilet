@@ -2,7 +2,7 @@ spring:
 
   redis:
     host:
-      localhost
+      redis
     port:
       6379
     password:
@@ -29,7 +29,7 @@ spring:
             user-name-attribute: id
 
   datasource:
-    url: jdbc:mysql://localhost:3306/findToilet
+    url: jdbc:mysql://mysql:3306/findToilet
     username: myuser
     password: mypassword
     driver-class-name: com.mysql.cj.jdbc.Driver
