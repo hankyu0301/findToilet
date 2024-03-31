@@ -8,8 +8,6 @@
 - 개발 인원 : 1명
 - 개발 기간 : 2024.01~
 
-📄 [Github Link](https://github.com/hankyu0301/find_toilet)
-
 📄 [API 명세](https://www.notion.so/d0ef1bdd0bfd4aa8bae448e0eab95326?pvs=21)
 
 ---
