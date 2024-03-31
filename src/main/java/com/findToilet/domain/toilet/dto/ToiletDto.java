@@ -4,7 +4,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 public class ToiletDto {
 
@@ -21,15 +20,16 @@ public class ToiletDto {
     private Double score;   //  화장실 평점 평균
     private Long scoreCount;    //  화장실 평점 갯수
 
-    public ToiletDto(Long id, String name, String road_address, Double latitude, Double longitude, Double distance,  boolean disabled, boolean kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
+    @Builder
+    public ToiletDto(Long id, String name, String road_address, Double latitude, Double longitude, Double distance,  boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
         this.id = id;
         this.name = name;
         this.road_address = road_address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.distance = distance;
-        this.disabled = disabled;
-        this.kids = kids;
+        this.disabled = (male_disabled && female_disabled);
+        this.kids = (male_kids && female_kids);
         this.diaper = diaper;
         this.operation_time = operation_time;
         this.score = score;

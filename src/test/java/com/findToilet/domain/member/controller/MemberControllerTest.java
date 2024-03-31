@@ -106,9 +106,9 @@ class MemberControllerTest {
         String jsonData = gson.toJson(request);
 
         Member member = Member.builder()
-                .email("finebears@naver.com")
+                .email("tester2@naver.com")
                 .password(passwordEncoder.encode("123456a!"))
-                .nickname("finebears")
+                .nickname("tester2")
                 .role(Member.Role.USER)
                 .build();
 

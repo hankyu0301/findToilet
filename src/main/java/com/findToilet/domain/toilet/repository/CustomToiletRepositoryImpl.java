@@ -48,15 +48,11 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
     }
 
     private BooleanExpression distanceLt(Double userLongitude, Double userLatitude, Double limit) {
-        return Expressions.stringTemplate("ST_Distance_Sphere({0}, {1})",
-                Expressions.stringTemplate("POINT({0}, {1})",
-                        userLongitude,
-                        userLatitude
-                ),
-                Expressions.stringTemplate("POINT({0}, {1})",
-                        toilet.longitude,
-                        toilet.latitude
-                )).loe(String.valueOf(limit));
+        return numberTemplate(Double.class, "ST_Distance_Sphere(POINT({0}, {1}), POINT({2}, {3}))",
+                userLongitude,
+                userLatitude,
+                toilet.longitude,
+                toilet.latitude).loe(limit);
     }
 
 
@@ -85,18 +81,21 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
                         toilet.id,
                         toilet.name,
                         toilet.road_address,
-                        toilet.operation_time,
                         toilet.latitude,
                         toilet.longitude,
-                        getDistance(toilet.longitude, toilet.latitude, cond.getUserLongitude(), cond.getUserLatitude()),
-                        toilet.male_disabled.and(toilet.female_disabled).as("disabled"),
-                        toilet.male_kids.and(toilet.female_kids).as("kids"),
+                        getDistance(toilet.longitude, toilet.latitude, cond.getUserLongitude(), cond.getUserLatitude()).as("distance"),
+                        toilet.male_disabled,
+                        toilet.female_disabled,
+                        toilet.male_kids,
+                        toilet.female_kids,
                         toilet.diaper,
+                        toilet.operation_time,
                         review.score.coalesce((double) 0).avg().as("score"),
                         review.count().as("scoreCount")))
                 .from(toilet)
                 .leftJoin(toilet.reviewList, review)
                 .where(predicate)
+                .groupBy(toilet.id)
                 .orderBy(getDistance(toilet.longitude, toilet.latitude, cond.getUserLongitude(), cond.getUserLatitude()).asc());
     }
 

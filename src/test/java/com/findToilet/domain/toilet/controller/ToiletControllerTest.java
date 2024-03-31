@@ -6,7 +6,10 @@ import com.findToilet.domain.toilet.dto.*;
 import com.findToilet.domain.toilet.dto.ToiletReadResponseDto;
 import com.findToilet.domain.toilet.repository.ToiletRepository;
 import com.findToilet.domain.toilet.service.ToiletService;
+import com.findToilet.global.auth.jwt.JwtTokenizer;
+import com.findToilet.helper.StubData;
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -18,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -30,10 +34,12 @@ import org.springframework.util.MultiValueMap;
 import java.util.List;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.findToilet.helper.StubData.MockSecurity.getValidAccessToken;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -63,6 +69,15 @@ class ToiletControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private String accessTokenForUser;
+
+    @Autowired
+    private JwtTokenizer jwtTokenizer;
+    @BeforeAll
+    public void init() {
+        accessTokenForUser = StubData.MockSecurity.getValidAdminAccessToken(jwtTokenizer.getSecretKey());
+    }
+
     @Test
     @DisplayName("화장실을 등록한다.")
     void createToilet() throws Exception {
@@ -90,6 +105,7 @@ class ToiletControllerTest {
         mockMvc.perform(
                         post(TOILET_DEFAULT_URI)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser)
                                 .content(jsonData))
                 //then
                 .andExpect(status().isCreated())
@@ -101,6 +117,8 @@ class ToiletControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Toilet")
                                                 .description("화장실 등록")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .requestFields(
                                                         fieldWithPath("name").type(JsonFieldType.STRING).description("회원 id"),
                                                         fieldWithPath("road_address").type(JsonFieldType.STRING).description("도로명 주소"),
@@ -140,7 +158,9 @@ class ToiletControllerTest {
 
         //when
         mockMvc.perform(
-                        get(TOILET_DEFAULT_URI + "/{id}", 1L))
+                        get(TOILET_DEFAULT_URI + "/{id}", 1L)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
+
                 //then
                 .andExpect(status().isOk())
                 .andDo(
@@ -151,6 +171,8 @@ class ToiletControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Toilet")
                                                 .description("화장실 조회")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .responseFields(
                                                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 id"),
                                                         fieldWithPath("data.name").type(JsonFieldType.STRING).description("회원 이름"),
@@ -186,8 +208,10 @@ class ToiletControllerTest {
                 .latitude(37.445620228619)
                 .longitude(126.65182310263)
                 .distance(100.0)
-                .disabled(false)
-                .kids(false)
+                .male_disabled(false)
+                .female_disabled(false)
+                .male_kids(false)
+                .female_kids(false)
                 .diaper(false)
                 .operation_time("everyday")
                 .score(4.5)
@@ -211,6 +235,7 @@ class ToiletControllerTest {
         mockMvc.perform(
                 get(TOILET_DEFAULT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser)
                         .accept(MediaType.APPLICATION_JSON)
                         .params(params))
 
@@ -218,20 +243,22 @@ class ToiletControllerTest {
                         MockMvcRestDocumentationWrapper.document("화장실 목록 조회 예제",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
-                                requestParameters(
-                                        List.of(
-                                                parameterWithName("page").description("Page 번호"),
-                                                parameterWithName("size").description("Page Size"),
-                                                parameterWithName("userLatitude").description("사용자 위도"),
-                                                parameterWithName("userLongitude").description("사용자 경도"),
-                                                parameterWithName("limit").description("탐색하는 거리"),
-                                                parameterWithName("disabled").description("장애인용 변기 유무"),
-                                                parameterWithName("kids").description("유아용 변기 유무"),
-                                                parameterWithName("diaper").description("기저귀 교환대 유무"))),
                         resource(
                                 ResourceSnippetParameters.builder()
                                         .tag("Toilet")
                                         .description("화장실 목록 조회")
+                                        .requestHeaders(
+                                                headerWithName("Authorization").description("발급받은 인증 토큰"))
+                                        .requestParameters(
+                                            parameterWithName("page").description("Page 번호"),
+                                            parameterWithName("size").description("Page Size"),
+                                            parameterWithName("userLatitude").description("사용자 위도"),
+                                            parameterWithName("userLongitude").description("사용자 경도"),
+                                            parameterWithName("limit").description("탐색하는 거리"),
+                                            parameterWithName("disabled").description("장애인용 변기 유무").optional(),
+                                            parameterWithName("kids").description("유아용 변기 유무").optional(),
+                                            parameterWithName("diaper").description("기저귀 교환대 유무").optional()
+                                        )
                                         .responseFields(
                                                 fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("총 화장실 갯수"),
                                                 fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
@@ -271,6 +298,7 @@ class ToiletControllerTest {
         mockMvc.perform(
                         put(TOILET_DEFAULT_URI + "/{id}", 1L)
                                 .contentType(MediaType.APPLICATION_JSON)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser)
                                 .content(jsonData))
                 //then
                 .andExpect(status().isOk())
@@ -282,6 +310,8 @@ class ToiletControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Toilet")
                                                 .description("화장실 조회")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .requestFields(
                                                         fieldWithPath("name").type(JsonFieldType.STRING).description("회원 이름"),
                                                         fieldWithPath("road_address").type(JsonFieldType.STRING).description("도로명 주소"),
@@ -298,7 +328,8 @@ class ToiletControllerTest {
 
         //when
         mockMvc.perform(
-                        delete(TOILET_DEFAULT_URI + "/{id}", 1L))
+                        delete(TOILET_DEFAULT_URI + "/{id}", 1L)
+                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser))
                 //then
                 .andExpect(status().isOk())
                 .andDo(
@@ -309,6 +340,8 @@ class ToiletControllerTest {
                                         ResourceSnippetParameters.builder()
                                                 .tag("Toilet")
                                                 .description("화장실 삭제")
+                                                .requestHeaders(
+                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
                                                 .build())));
     }
 }
