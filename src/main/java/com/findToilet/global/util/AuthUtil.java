@@ -14,7 +14,8 @@ public class AuthUtil {
             throw new CustomException(ExceptionCode.UNKNOWN_USER);
         }
 
-        long memberId = Long.parseLong(authentication.getName().toString());
+
+        long memberId = Long.parseLong(authentication.getName());
 
         return memberId;
     }

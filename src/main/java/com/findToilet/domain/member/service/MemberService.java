@@ -31,6 +31,7 @@ public class MemberService {
                 .email(req.getEmail())
                 .password(passwordEncoder.encode(req.getPassword()))
                 .nickname(req.getNickname())
+                .role(Member.Role.USER)
                 .build();
     }
 

@@ -160,8 +160,8 @@ public class JwtTokenizer {
         List<String> roles = (List)claims.get("roles");
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles.toArray(String[]::new));
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                claims.get("email"),
                 claims.get("memberId"),
+                claims.get("email"),
                 authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
