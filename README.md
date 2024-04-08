@@ -15,7 +15,7 @@
 ### 빌드 방법
 
 ```docker
-docker-compose build && docker-compose up
+docker-compose build && docker-compose up -d
 ```
 
 ---
