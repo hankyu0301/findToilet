@@ -102,13 +102,13 @@ class MemberControllerTest {
     @DisplayName("로그인을 한다.")
     void loginMember() throws Exception {
         //given
-        LoginDto request = new LoginDto("finebears@naver.com", "123456a!");
+        LoginDto request = new LoginDto("tester@naver.com", "123456a!");
         String jsonData = gson.toJson(request);
 
         Member member = Member.builder()
-                .email("tester2@naver.com")
+                .email("tester@naver.com")
                 .password(passwordEncoder.encode("123456a!"))
-                .nickname("tester2")
+                .nickname("tester")
                 .role(Member.Role.USER)
                 .build();
 
