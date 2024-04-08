@@ -12,6 +12,14 @@
 
 ---
 
+### 빌드 방법
+
+```docker
+docker-compose build && docker-compose up
+```
+
+---
+
 ### 사용 Skills
 
 - Java, SpringBoot, Gradle
