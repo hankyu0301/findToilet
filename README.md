@@ -3,6 +3,7 @@
 ---
 
 회원의 위치정보나 여러가지 조건으로 화장실 목록을 필터링하여 조회하는 서비스입니다.
+Excel이나 Json에서 원하는 데이터만 추출해 Insert Query를 작성하는 기능이 있습니다.
 
 - 프로젝트 명칭 : FindToilet
 - 개발 인원 : 1명
@@ -16,6 +17,7 @@
 
 ```docker
 docker-compose build && docker-compose up -d
+http://localhost:8080/docs/swagger-ui/index.html에서 API 명세를 확인할 수 있습니다.
 ```
 
 ---
