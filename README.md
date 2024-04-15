@@ -17,9 +17,8 @@ Excel이나 Json에서 원하는 데이터만 추출해 Insert Query를 작성�
 
 ```docker
 docker-compose build && docker-compose up -d
-http://localhost:8080/docs/swagger-ui/index.html에서 API 명세를 확인할 수 있습니다.
 ```
-
+http://localhost:8080/docs/swagger-ui/index.html 에서 API 명세를 확인할 수 있습니다.
 ---
 
 ### 사용 Skills
