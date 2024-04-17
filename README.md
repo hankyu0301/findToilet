@@ -9,7 +9,6 @@ Excel이나 Json에서 원하는 데이터만 추출해 Insert Query를 작성�
 - 프로젝트 명칭 : FindToilet
 - 개발 인원 : 1명
 - 개발 기간 : 2024.01~
-- 📄 [Github Link](https://github.com/hankyu0301/find_toilet)
 - 📄 [API 명세](https://www.notion.so/d0ef1bdd0bfd4aa8bae448e0eab95326?pvs=21)
 
 ---
