@@ -42,10 +42,10 @@ public class UserLocationCalculator {
                     return calculateDistance <= distance ? dto.withDistance(calculateDistance) : null;
                 })
                 .filter(Objects::nonNull)
+                .sorted(Comparator.comparingDouble(ToiletDto::getDistance))
                 .collect(Collectors.toList());
 
         // 거리에 따라 정렬
-        filteredToiletDtos.sort(Comparator.comparingDouble(ToiletDto::getDistance));
 
         return filteredToiletDtos;
     }
