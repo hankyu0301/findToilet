@@ -2,10 +2,7 @@ package com.findToilet.domain.toilet.repository;
 
 import com.findToilet.domain.toilet.dto.ToiletDto;
 import com.findToilet.domain.toilet.dto.ToiletReadResponseDto;
-import com.findToilet.domain.toilet.dto.ToiletSearchCondition;
 import com.findToilet.domain.toilet.entity.Toilet;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
