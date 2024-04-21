@@ -105,7 +105,7 @@ openapi3 {
             {url = 'http://localhost:8080'}
     ]
     title = "FindToilet API 문서"
-    description = "admin jwt : \n eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZW1haWwiOiJmaW5lYmVhcnNAbmF2ZXIuY29tIiwibWVtYmVySWQiOiIxIiwic3ViIjoiZmluZWJlYXJzQG5hdmVyLmNvbSIsImlhdCI6MTcxMjU0OTg4OCwiZXhwIjoxNzEyNTYwNjg4fQ.TZSCKW6pu2YxLdxc-lPMvvuR-6ZL9IxDGlGJdcauLo4"
+    description = "ADMIN JWT : eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJST0xFX0FETUlOIl0sImVtYWlsIjoiZmluZWJlYXJzQG5hdmVyLmNvbSIsIm1lbWJlcklkIjoiMSIsInN1YiI6ImZpbmViZWFyc0BuYXZlci5jb20iLCJpYXQiOjE3MTI1NDk4ODgsImV4cCI6MTgxNjk2MDY4MH0.QM91JjhweXDTtJMmPvC-oraKJLHKajjtnMLfW5Qb7hk"
     version = "0.0.1"
     outputFileNamePrefix = 'open-api-3.0.1'
     format = 'json'
