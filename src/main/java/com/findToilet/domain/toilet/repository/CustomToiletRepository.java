@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 
 public interface CustomToiletRepository {
 
-    Page<ToiletDto> findAllByCondition(ToiletSearchCondition cond);
+    Page<ToiletDto> findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond);
 }

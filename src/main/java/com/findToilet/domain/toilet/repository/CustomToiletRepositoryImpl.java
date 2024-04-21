@@ -31,7 +31,7 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
     }
 
     @Override
-    public Page<ToiletDto> findAllByCondition(ToiletSearchCondition cond) {
+    public Page<ToiletDto> findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond) {
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
         Predicate predicate = createPredicate(cond);
         List<ToiletDto> toiletDtos = fetchAll(pageable, predicate, cond);
@@ -42,9 +42,9 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
     private Predicate createPredicate(ToiletSearchCondition cond) {
         return new BooleanBuilder()
                 .and(distanceLt(cond.getUserLongitude(), cond.getUserLatitude(), cond.getLimit()))
-                .and(disabledEq(cond.isDisabled()))
-                .and(kidsEq(cond.isKids()))
-                .and(diaperEq(cond.isDiaper()));
+                .and(disabledEq(cond.getDisabled()))
+                .and(kidsEq(cond.getKids()))
+                .and(diaperEq(cond.getDiaper()));
     }
 
     private BooleanExpression distanceLt(Double userLongitude, Double userLatitude, Double limit) {
@@ -56,16 +56,16 @@ public class CustomToiletRepositoryImpl extends QuerydslRepositorySupport implem
     }
 
 
-    private BooleanExpression disabledEq(boolean disabled) {
-        return disabled ? (toilet.male_disabled.isTrue().and(toilet.female_disabled.isTrue())) : null;
+    private BooleanExpression disabledEq(Boolean disabled) {
+        return (disabled != null && disabled) ? toilet.male_disabled.isTrue().and(toilet.female_disabled.isTrue()) : null;
     }
 
-    private BooleanExpression kidsEq(boolean kids) {
-        return kids ? (toilet.male_kids.isTrue().and(toilet.female_kids.isTrue())) : null;
+    private BooleanExpression kidsEq(Boolean kids) {
+        return (kids != null && kids) ? toilet.male_kids.isTrue().and(toilet.female_kids.isTrue()) : null;
     }
 
-    private BooleanExpression diaperEq(boolean diaper) {
-        return diaper ? toilet.diaper.isTrue() : null;
+    private BooleanExpression diaperEq(Boolean diaper) {
+        return (diaper != null && diaper) ? toilet.diaper.isTrue() : null;
     }
 
     //스프링 데이터가 제공하는 페이징을 Querydsl로 편리하게 변환

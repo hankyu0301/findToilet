@@ -35,4 +35,24 @@ public class ToiletDto {
         this.score = score;
         this.scoreCount = scoreCount;
     }
+
+    @Builder
+    public ToiletDto(Long id, String name, String road_address, Double latitude, Double longitude, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
+        this.id = id;
+        this.name = name;
+        this.road_address = road_address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.disabled = (male_disabled && female_disabled);
+        this.kids = (male_kids && female_kids);
+        this.diaper = diaper;
+        this.operation_time = operation_time;
+        this.score = score;
+        this.scoreCount = scoreCount;
+    }
+
+    public ToiletDto withDistance(double calculateDistance) {
+        this.setDistance(calculateDistance * 1000);
+        return this;
+    }
 }

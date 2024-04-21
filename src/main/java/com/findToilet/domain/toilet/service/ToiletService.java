@@ -7,10 +7,13 @@ import com.findToilet.domain.toilet.repository.ToiletRepository;
 import com.findToilet.global.exception.CustomException;
 import com.findToilet.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional
 @Service
@@ -20,9 +23,29 @@ public class ToiletService {
     private final ToiletRepository toiletRepository;
 
     @Transactional(readOnly = true)
-    public ToiletListDto findAllByCondition(ToiletSearchCondition cond) {
+    public ToiletListDto findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond) {
+        return ToiletListDto.toDto(toiletRepository.findAllByConditionUsingMySQLFunction(cond));
+    }
+
+    @Transactional(readOnly = true)
+    public ToiletListDto findAllByConditionUsingJPQL(ToiletSearchCondition cond) {
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
-        return ToiletListDto.toDto(toiletRepository.findAllByCondition(cond));
+
+        UserLocationCalculator locationService = new UserLocationCalculator(new PointDto(cond.getUserLatitude(), cond.getUserLongitude()), cond.getLimit());
+
+        Boolean kids = cond.getKids();
+        Boolean disabled = cond.getDisabled();
+        Boolean diaper = cond.getDiaper();
+
+        List<ToiletDto> toiletDtoList = toiletRepository.findAllByCondition(kids, disabled, diaper,
+                locationService.getLatitudeMinus(),
+                locationService.getLatitudePlus(), locationService.getLongitudeMinus(),
+                locationService.getLongitudePlus());
+
+        List<ToiletDto> updatedToiletDtos =
+                locationService.calculateDistanceAndRemove(toiletDtoList);
+
+        return ToiletListDto.toDto(new PageImpl<>(updatedToiletDtos, pageable, updatedToiletDtos.size()));
     }
 
     public void create(ToiletCreateRequest req) {

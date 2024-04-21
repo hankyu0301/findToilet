@@ -17,9 +17,15 @@ public class ToiletController {
 
     private final ToiletService toiletService;
 
-    @GetMapping("/api/toilets")
-    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByCondition(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
-        ToiletListDto toiletListDto = toiletService.findAllByCondition(toiletSearchCondition);
+    @GetMapping("/api/toilets/v1")
+    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByConditionUsingJPQL(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
+        ToiletListDto toiletListDto = toiletService.findAllByConditionUsingJPQL(toiletSearchCondition);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletListDto));
+    }
+
+    @GetMapping("/api/toilets/v2")
+    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByConditionUsingMySQLFunction(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
+        ToiletListDto toiletListDto = toiletService.findAllByConditionUsingMySQLFunction(toiletSearchCondition);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletListDto));
     }
 

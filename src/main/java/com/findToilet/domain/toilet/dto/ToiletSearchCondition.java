@@ -32,13 +32,10 @@ public class ToiletSearchCondition {
     @PositiveOrZero(message = "거리는 음수일 수 없습니다.")
     private Double limit; // m 단위
 
-    @NotNull
-    private boolean disabled; // 장애인용 변기가 구비되어 있는지?
+    private Boolean disabled; // 장애인용 변기가 구비되어 있는지?
 
-    @NotNull
-    private boolean kids; // 유아용 변기가 구비되어 있는지?
+    private Boolean kids; // 유아용 변기가 구비되어 있는지?
 
-    @NotNull
-    private boolean diaper; // 기저귀 교환대가 있는지?
+    private Boolean diaper; // 기저귀 교환대가 있는지?
 
 }
