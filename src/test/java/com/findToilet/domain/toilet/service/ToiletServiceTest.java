@@ -8,6 +8,9 @@ import com.findToilet.domain.toilet.dto.ToiletSearchCondition;
 import com.findToilet.domain.toilet.repository.ToiletRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -47,13 +50,14 @@ class ToiletServiceTest {
 
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
 
-        Page<ToiletDto> toiletDtoPage = new PageImpl<>(List.of(ToiletDto.builder()
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Point point = geometryFactory.createPoint(new Coordinate(126.65182310263, 37.445620228619));
+
+        List<ToiletDto> toiletDtoList = List.of(ToiletDto.builder()
                 .id(1L)
                 .name("testName")
                 .road_address("우리집")
-                .latitude(37.445620228619)
-                .longitude(126.65182310263)
-                .distance(0.0)
+                .location(point)
                 .male_disabled(false)
                 .female_disabled(false)
                 .male_kids(false)
@@ -61,9 +65,15 @@ class ToiletServiceTest {
                 .diaper(false)
                 .operation_time("everyday")
                 .score(4.5)
-                .scoreCount(99L).build()), pageable, 1L);
+                .scoreCount(99L).build());
 
-        given(toiletRepository.findAllByConditionUsingMySQLFunction(cond)).willReturn(toiletDtoPage);
+        Page<ToiletDto> toiletDtoPage = new PageImpl<>(toiletDtoList, pageable, 1L);
+
+        Boolean kids = cond.getKids();
+        Boolean disabled = cond.getDisabled();
+        Boolean diaper = cond.getDiaper();
+
+        given(toiletRepository.findAllByConditionUsingMySQLFunction(kids,disabled,diaper,cond.getUserLongitude(),cond.getUserLatitude(),cond.getLimit())).willReturn(toiletDtoList);
 
         // when
         ToiletListDto toiletListDto = toiletService.findAllByConditionUsingMySQLFunction(cond);
@@ -88,13 +98,14 @@ class ToiletServiceTest {
 
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
 
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Point point = geometryFactory.createPoint(new Coordinate(126.65182310263, 37.445620228619));
+
         List<ToiletDto> toiletDtoList = List.of(ToiletDto.builder()
                 .id(1L)
                 .name("testName")
                 .road_address("우리집")
-                .latitude(37.445620228619)
-                .longitude(126.65182310263)
-                .distance(0.0)
+                .location(point)
                 .male_disabled(false)
                 .female_disabled(false)
                 .male_kids(false)

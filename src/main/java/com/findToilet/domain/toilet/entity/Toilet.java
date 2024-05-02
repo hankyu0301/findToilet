@@ -3,6 +3,7 @@ package com.findToilet.domain.toilet.entity;
 import com.findToilet.domain.review.entity.Review;
 import com.findToilet.global.audit.BaseEntity;
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -28,11 +29,8 @@ public class Toilet extends BaseEntity {
     @Column(nullable = false)
     private String address; // 지번 주소
 
-    @Column(nullable = false)
-    private Double latitude; // 위도
-
-    @Column(nullable = false)
-    private Double longitude; // 경도
+    @Column(nullable = false, columnDefinition = "Point")
+    private Point location; // 위도와 경도를 포함한 공간 정보
 
     @Column(nullable = false)
     private boolean male_disabled; // 장애인 이용 가능 시설인지?
@@ -54,12 +52,11 @@ public class Toilet extends BaseEntity {
     @OneToMany(mappedBy = "toilet")
     private List<Review> reviewList = new ArrayList<>();
 
-    public Toilet(String name, String road_address, String address, Double latitude, Double longitude, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time) {
+    public Toilet(String name, String road_address, String address, Point location, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time) {
         this.name = name;
         this.road_address = road_address;
         this.address = address;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.location = location;
         this.male_disabled = male_disabled;
         this.female_disabled = female_disabled;
         this.male_kids = male_kids;

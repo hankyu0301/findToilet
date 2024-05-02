@@ -7,6 +7,9 @@ import com.findToilet.domain.toilet.repository.ToiletRepository;
 import com.findToilet.global.exception.CustomException;
 import com.findToilet.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +27,9 @@ public class ToiletService {
 
     @Transactional(readOnly = true)
     public ToiletListDto findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond) {
-        return ToiletListDto.toDto(toiletRepository.findAllByConditionUsingMySQLFunction(cond));
+        Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
+        List<ToiletDto> toiletDtoList = toiletRepository.findAllByConditionUsingMySQLFunction(cond.getKids(), cond.getDisabled(), cond.getDiaper(), cond.getUserLongitude(), cond.getUserLatitude(), cond.getLimit());
+        return ToiletListDto.toDto(new PageImpl<>(toiletDtoList, pageable, toiletDtoList.size()));
     }
 
     @Transactional(readOnly = true)
@@ -49,13 +54,14 @@ public class ToiletService {
     }
 
     public void create(ToiletCreateRequest req) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        Point point = geometryFactory.createPoint(new Coordinate(req.getLongitude(), req.getLatitude()));
 
         Toilet toilet = Toilet.builder()
                 .name(req.getName())
                 .road_address(req.getRoad_address())
                 .address(req.getAddress())
-                .latitude(req.getLatitude())
-                .longitude(req.getLongitude())
+                .location(point)
                 .male_disabled(req.isMale_disabled())
                 .female_disabled(req.isFemale_disabled())
                 .male_kids(req.isMale_kids())
@@ -63,6 +69,7 @@ public class ToiletService {
                 .diaper(req.isDiaper())
                 .operation_time(req.getOperation_time())
                 .build();
+
         toiletRepository.save(toilet);
     }
 

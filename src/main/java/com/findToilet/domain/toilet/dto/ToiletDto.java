@@ -1,6 +1,7 @@
 package com.findToilet.domain.toilet.dto;
 
 import lombok.*;
+import org.locationtech.jts.geom.Point;
 
 @Getter
 @Setter
@@ -21,13 +22,12 @@ public class ToiletDto {
     private Long scoreCount;    //  화장실 평점 갯수
 
     @Builder
-    public ToiletDto(Long id, String name, String road_address, Double latitude, Double longitude, Double distance,  boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
+    public ToiletDto(Long id, String name, String road_address, Point location, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
         this.id = id;
         this.name = name;
         this.road_address = road_address;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.distance = distance;
+        this.latitude = location.getY();
+        this.longitude = location.getX();
         this.disabled = (male_disabled && female_disabled);
         this.kids = (male_kids && female_kids);
         this.diaper = diaper;
@@ -36,13 +36,14 @@ public class ToiletDto {
         this.scoreCount = scoreCount;
     }
 
-    @Builder
-    public ToiletDto(Long id, String name, String road_address, Double latitude, Double longitude, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
+
+    public ToiletDto(Long id, String name, String road_address, Point location, Double distance, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
         this.id = id;
         this.name = name;
         this.road_address = road_address;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.latitude = location.getY();
+        this.longitude = location.getX();
+        this.distance = distance;
         this.disabled = (male_disabled && female_disabled);
         this.kids = (male_kids && female_kids);
         this.diaper = diaper;
