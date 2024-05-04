@@ -2,6 +2,7 @@ package com.findToilet.dataInserter.data;
 
 import com.findToilet.dataInserter.data.dataconfig.producer.ConfigProducer;
 import com.findToilet.dataInserter.data.dataloader.QueryRunner;
+import com.findToilet.dataInserter.data.dataset.DataSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

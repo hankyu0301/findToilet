@@ -1,7 +1,7 @@
 package com.findToilet.dataInserter.data.util.type;
 
 public enum DatabaseType {
-    VARCHAR, FLOAT, DATETIME, BOOLEAN;
+    VARCHAR, FLOAT, DATETIME, BOOLEAN, POINT;
 
     public String getDatabaseFormat(String data) {
         if (data == null || data.isEmpty()) {
@@ -9,6 +9,8 @@ public enum DatabaseType {
         }
         if (this.equals(DatabaseType.VARCHAR)) {
             return "\"" + data + "\"";
+        } else if (this.equals(DatabaseType.POINT)) {
+            return "ST_GeomFromText('POINT(" + data + ")', 4326)";
         } else if (this.equals(DatabaseType.FLOAT)) {
             return Double.valueOf(data).toString();
         } else if (this.equals(DatabaseType.BOOLEAN)) {

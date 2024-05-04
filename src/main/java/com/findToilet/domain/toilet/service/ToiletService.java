@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -28,29 +29,10 @@ public class ToiletService {
     @Transactional(readOnly = true)
     public ToiletListDto findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond) {
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
-        List<ToiletDto> toiletDtoList = toiletRepository.findAllByConditionUsingMySQLFunction(cond.getKids(), cond.getDisabled(), cond.getDiaper(), cond.getUserLongitude(), cond.getUserLatitude(), cond.getLimit());
+        String point = String.format("POINT(%f %f)", cond.getUserLatitude(), cond.getUserLongitude());
+        List<ToiletDtoInterface> toiletDtoInterfaces = toiletRepository.findAllByConditionUsingMySQLFunction(cond.getKids(), cond.getDisabled(), cond.getDiaper(), point, cond.getLimit());
+        List<ToiletDto> toiletDtoList = toiletDtoInterfaces.stream().map(ToiletDto::new).collect(Collectors.toList());
         return ToiletListDto.toDto(new PageImpl<>(toiletDtoList, pageable, toiletDtoList.size()));
-    }
-
-    @Transactional(readOnly = true)
-    public ToiletListDto findAllByConditionUsingJPQL(ToiletSearchCondition cond) {
-        Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
-
-        UserLocationCalculator locationService = new UserLocationCalculator(new PointDto(cond.getUserLatitude(), cond.getUserLongitude()), cond.getLimit());
-
-        Boolean kids = cond.getKids();
-        Boolean disabled = cond.getDisabled();
-        Boolean diaper = cond.getDiaper();
-
-        List<ToiletDto> toiletDtoList = toiletRepository.findAllByCondition(kids, disabled, diaper,
-                locationService.getLatitudeMinus(),
-                locationService.getLatitudePlus(), locationService.getLongitudeMinus(),
-                locationService.getLongitudePlus());
-
-        List<ToiletDto> updatedToiletDtos =
-                locationService.calculateDistanceAndRemove(toiletDtoList);
-
-        return ToiletListDto.toDto(new PageImpl<>(updatedToiletDtos, pageable, updatedToiletDtos.size()));
     }
 
     public void create(ToiletCreateRequest req) {

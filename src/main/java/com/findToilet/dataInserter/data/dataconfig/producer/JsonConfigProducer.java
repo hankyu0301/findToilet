@@ -39,6 +39,9 @@ public class JsonConfigProducer implements ConfigProducer {
     private Consumer<Map<String, String>> makeMapConsumer() {
         return (map) -> {
             AddressInfoDto address = changeByGeocoderKakao.getCoordinateByAddress(map.get("address"));
+            String longitude = address.getLongitude().toString();
+            String latitude = address.getLatitude().toString();
+            map.put("location", latitude + " " + longitude);
             map.put("road_address", address.getRoad_address());
         };
     }
@@ -49,8 +52,7 @@ public class JsonConfigProducer implements ConfigProducer {
         databaseTypeMap.put("name", DatabaseType.VARCHAR);
         databaseTypeMap.put("road_address", DatabaseType.VARCHAR);
         databaseTypeMap.put("address", DatabaseType.VARCHAR);
-        databaseTypeMap.put("latitude", DatabaseType.FLOAT);
-        databaseTypeMap.put("longitude", DatabaseType.FLOAT);
+        databaseTypeMap.put("location", DatabaseType.POINT);
         databaseTypeMap.put("male_disabled", DatabaseType.BOOLEAN);
         databaseTypeMap.put("female_disabled", DatabaseType.BOOLEAN);
         databaseTypeMap.put("male_kids", DatabaseType.BOOLEAN);
@@ -66,8 +68,6 @@ public class JsonConfigProducer implements ConfigProducer {
 
         bathroomMap.put("toiletName", "name");
         bathroomMap.put("address", "address");
-        bathroomMap.put("lat", "latitude");
-        bathroomMap.put("lng", "longitude");
 
         return bathroomMap;
     }

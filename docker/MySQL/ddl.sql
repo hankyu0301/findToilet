@@ -27,19 +27,18 @@ CREATE TABLE review (
 
 -- toilet 테이블 생성
 CREATE TABLE toilet (
-                        id BIGINT NOT NULL AUTO_INCREMENT,
-                        created_at DATETIME(6),
-                        modified_at DATETIME(6),
-                        address VARCHAR(255) NOT NULL,
-                        diaper BIT NOT NULL,
-                        female_disabled BIT NOT NULL,
-                        female_kids BIT NOT NULL,
-                        latitude DOUBLE PRECISION NOT NULL,
-                        longitude DOUBLE PRECISION NOT NULL,
-                        male_disabled BIT NOT NULL,
-                        male_kids BIT NOT NULL,
+                        id BIGINT AUTO_INCREMENT PRIMARY KEY,
                         name VARCHAR(255) NOT NULL,
-                        operation_time VARCHAR(255),
                         road_address VARCHAR(255) NOT NULL,
-                        PRIMARY KEY (id)
+                        address VARCHAR(255) NOT NULL,
+                        location POINT NOT NULL SRID 4326,
+                        male_disabled BOOLEAN NOT NULL,
+                        female_disabled BOOLEAN NOT NULL,
+                        male_kids BOOLEAN NOT NULL,
+                        female_kids BOOLEAN NOT NULL,
+                        diaper BOOLEAN NOT NULL,
+                        operation_time VARCHAR(100),
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        SPATIAL INDEX(location)
 ) ENGINE=InnoDB;

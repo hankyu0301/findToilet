@@ -17,15 +17,13 @@ public class ToiletController {
 
     private final ToiletService toiletService;
 
-    @GetMapping("/api/toilets/v1")
-    public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByConditionUsingJPQL(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
-        ToiletListDto toiletListDto = toiletService.findAllByConditionUsingJPQL(toiletSearchCondition);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletListDto));
-    }
-
-    @GetMapping("/api/toilets/v2")
+    @GetMapping("/api/toilets")
     public ResponseEntity<ResponseDto<ToiletListDto>> findAllToiletByConditionUsingMySQLFunction(@Valid @ModelAttribute ToiletSearchCondition toiletSearchCondition) {
+        long startTime = System.currentTimeMillis(); // 메서드 시작 시간 기록
         ToiletListDto toiletListDto = toiletService.findAllByConditionUsingMySQLFunction(toiletSearchCondition);
+        long endTime = System.currentTimeMillis(); // 메서드 종료 시간 기록
+        long elapsedTime = endTime - startTime; // 경과 시간 계산
+        System.out.println("elapsedTime : " + elapsedTime);
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseDto<>(toiletListDto));
     }
 

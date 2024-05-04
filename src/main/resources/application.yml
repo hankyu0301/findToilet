@@ -40,6 +40,11 @@ spring:
     properties:
       hibernate:
         dialect: com.findToilet.global.config.MySQLCustomDialect
+    database-platform=org:
+      hibernate:
+        spatial:
+          dialect:
+            mysql: MySQL8SpatialDialect
 
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
