@@ -18,7 +18,6 @@ public class ToiletDto {
     private Double score;   //  화장실 평점 평균
     private Long scoreCount;    //  화장실 평점 갯수
 
-    @Builder
     public ToiletDto(Long id, String name, String road_address, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
         this.id = id;
         this.name = name;
@@ -31,7 +30,7 @@ public class ToiletDto {
         this.scoreCount = scoreCount;
     }
 
-
+@Builder
     public ToiletDto(Long id, String name, String road_address, Double distance, boolean male_disabled, boolean female_disabled, boolean male_kids, boolean female_kids, boolean diaper, String operation_time, Double score, Long scoreCount) {
         this.id = id;
         this.name = name;

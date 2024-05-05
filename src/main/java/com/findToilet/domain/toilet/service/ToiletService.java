@@ -27,10 +27,10 @@ public class ToiletService {
     private final ToiletRepository toiletRepository;
 
     @Transactional(readOnly = true)
-    public ToiletListDto findAllByConditionUsingMySQLFunction(ToiletSearchCondition cond) {
+    public ToiletListDto findAllByCondition(ToiletSearchCondition cond) {
         Pageable pageable = PageRequest.of(cond.getPage(), cond.getSize());
         String point = String.format("POINT(%f %f)", cond.getUserLatitude(), cond.getUserLongitude());
-        List<ToiletDtoInterface> toiletDtoInterfaces = toiletRepository.findAllByConditionUsingMySQLFunction(cond.getKids(), cond.getDisabled(), cond.getDiaper(), point, cond.getLimit());
+        List<ToiletDtoInterface> toiletDtoInterfaces = toiletRepository.findAllByCondition(cond.getKids(), cond.getDisabled(), cond.getDiaper(), point, cond.getLimit());
         List<ToiletDto> toiletDtoList = toiletDtoInterfaces.stream().map(ToiletDto::new).collect(Collectors.toList());
         return ToiletListDto.toDto(new PageImpl<>(toiletDtoList, pageable, toiletDtoList.size()));
     }

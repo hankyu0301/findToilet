@@ -1,12 +1,10 @@
 package com.findToilet.domain.toilet.repository;
 
-import com.findToilet.domain.toilet.dto.ToiletDto;
 import com.findToilet.domain.toilet.dto.ToiletDtoInterface;
 import com.findToilet.domain.toilet.dto.ToiletReadResponseDto;
 import com.findToilet.domain.toilet.entity.Toilet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -24,5 +22,5 @@ public interface ToiletRepository extends JpaRepository<Toilet, Long>{
                     "and (:diaper is null or t.diaper = :diaper) " +
                     "group by t.id " +
                     "order by distance asc", nativeQuery = true)
-    List<ToiletDtoInterface> findAllByConditionUsingMySQLFunction(Boolean kids, Boolean disabled, Boolean diaper, String point, Double limit);
+    List<ToiletDtoInterface> findAllByCondition(Boolean kids, Boolean disabled, Boolean diaper, String point, Double limit);
 }

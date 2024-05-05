@@ -180,8 +180,8 @@ class ToiletControllerTest {
     }
 
     @Test
-    @DisplayName("화장실 목록을 MySQL 내장함수로 조회한다.")
-    void findAllToiletsByConditionUsingMySQLFunction() throws Exception {
+    @DisplayName("화장실 목록을 조회한다.")
+    void findAllByCondition() throws Exception {
         //given
         ToiletSearchCondition condition = ToiletSearchCondition.builder()
                 .page(0)
@@ -198,8 +198,6 @@ class ToiletControllerTest {
                 .id(1L)
                 .name("testName")
                 .road_address("우리집")
-                .latitude(37.445620228619)
-                .longitude(126.65182310263)
                 .distance(0.0)
                 .male_disabled(false)
                 .female_disabled(false)
@@ -213,7 +211,7 @@ class ToiletControllerTest {
 
         ToiletListDto result = ToiletListDto.toDto(toiletDtoPage);
 
-        given(service.findAllByConditionUsingMySQLFunction(any(ToiletSearchCondition.class))).willReturn(result);
+        given(service.findAllByCondition(any(ToiletSearchCondition.class))).willReturn(result);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("page", String.valueOf(condition.getPage()));
@@ -226,20 +224,20 @@ class ToiletControllerTest {
         params.add("diaper", String.valueOf(condition.getDiaper()));
 
         mockMvc.perform(
-                get(TOILET_DEFAULT_URI+ "/v2")
+                get(TOILET_DEFAULT_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser)
                         .accept(MediaType.APPLICATION_JSON)
                         .params(params))
 
                 .andExpect(status().isOk()).andDo(
-                        MockMvcRestDocumentationWrapper.document("MySQL 내장함수를 사용한 화장실 목록 조회 예제",
+                        MockMvcRestDocumentationWrapper.document("화장실 목록 조회 예제",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         resource(
                                 ResourceSnippetParameters.builder()
                                         .tag("Toilet")
-                                        .description("MySQL 내장함수를 사용한 화장실 목록 조회")
+                                        .description("화장실 목록 조회")
                                         .requestHeaders(
                                                 headerWithName("Authorization").description("발급받은 인증 토큰"))
                                         .requestParameters(
@@ -259,8 +257,6 @@ class ToiletControllerTest {
                                                 fieldWithPath("data.toiletDtoList[].id").type(JsonFieldType.NUMBER).description("화장실 id"),
                                                 fieldWithPath("data.toiletDtoList[].name").type(JsonFieldType.STRING).description("화장실 이름"),
                                                 fieldWithPath("data.toiletDtoList[].road_address").type(JsonFieldType.STRING).description("도로명 주소"),
-                                                fieldWithPath("data.toiletDtoList[].latitude").type(JsonFieldType.NUMBER).description("화장실 위도"),
-                                                fieldWithPath("data.toiletDtoList[].longitude").type(JsonFieldType.NUMBER).description("화장실 경도"),
                                                 fieldWithPath("data.toiletDtoList[].distance").type(JsonFieldType.NUMBER).description("화장실 까지의 거리"),
                                                 fieldWithPath("data.toiletDtoList[].disabled").type(JsonFieldType.BOOLEAN).description("장애인용 변기 유무"),
                                                 fieldWithPath("data.toiletDtoList[].kids").type(JsonFieldType.BOOLEAN).description("유아용 변기 유무"),
@@ -269,98 +265,6 @@ class ToiletControllerTest {
                                                 fieldWithPath("data.toiletDtoList[].score").type(JsonFieldType.NUMBER).description("화장실 평점"),
                                                 fieldWithPath("data.toiletDtoList[].scoreCount").type(JsonFieldType.NUMBER).description("평점 갯수"))
                                         .build())));
-    }
-
-    @Test
-    @DisplayName("화장실 목록을 JPQL로 조회한다.")
-    void findAllToiletsByConditionUsingJPQL() throws Exception {
-        //given
-        ToiletSearchCondition condition = ToiletSearchCondition.builder()
-                .page(0)
-                .size(20)
-                .userLatitude(37.445620228619)
-                .userLongitude(126.65182310263)
-                .limit(10000.0) // m
-                .disabled(false)
-                .kids(false)
-                .diaper(false)
-                .build();
-
-        Page<ToiletDto> toiletDtoPage = new PageImpl<>(List.of(ToiletDto.builder()
-                .id(1L)
-                .name("testName")
-                .road_address("우리집")
-                .latitude(37.445620228619)
-                .longitude(126.65182310263)
-                .distance(0.0)
-                .male_disabled(false)
-                .female_disabled(false)
-                .male_kids(false)
-                .female_kids(false)
-                .diaper(false)
-                .operation_time("everyday")
-                .score(4.5)
-                .scoreCount(99L)
-                .build()), Pageable.ofSize(condition.getSize()), 1L);
-
-        ToiletListDto result = ToiletListDto.toDto(toiletDtoPage);
-
-        given(service.findAllByConditionUsingJPQL(any(ToiletSearchCondition.class))).willReturn(result);
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("page", String.valueOf(condition.getPage()));
-        params.add("size", String.valueOf(condition.getSize()));
-        params.add("userLatitude", String.valueOf(condition.getUserLatitude()));
-        params.add("userLongitude", String.valueOf(condition.getUserLongitude()));
-        params.add("limit", String.valueOf(condition.getLimit()));
-        params.add("disabled", String.valueOf(condition.getDisabled()));
-        params.add("kids", String.valueOf(condition.getKids()));
-        params.add("diaper", String.valueOf(condition.getDiaper()));
-
-        mockMvc.perform(
-                        get(TOILET_DEFAULT_URI+"/v1")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessTokenForUser)
-                                .accept(MediaType.APPLICATION_JSON)
-                                .params(params))
-
-                .andExpect(status().isOk()).andDo(
-                        MockMvcRestDocumentationWrapper.document("JPQL을 사용한 화장실 목록 조회 예제",
-                                preprocessRequest(prettyPrint()),
-                                preprocessResponse(prettyPrint()),
-                                resource(
-                                        ResourceSnippetParameters.builder()
-                                                .tag("Toilet")
-                                                .description("JPQL을 사용한 화장실 목록 조회")
-                                                .requestHeaders(
-                                                        headerWithName("Authorization").description("발급받은 인증 토큰"))
-                                                .requestParameters(
-                                                        parameterWithName("page").description("Page 번호"),
-                                                        parameterWithName("size").description("Page Size"),
-                                                        parameterWithName("userLatitude").description("사용자 위도, ex)37.566826004661"),
-                                                        parameterWithName("userLongitude").description("사용자 경도, ex)126.978652258309"),
-                                                        parameterWithName("limit").description("탐색하는 거리"),
-                                                        parameterWithName("disabled").description("장애인용 변기 유무").optional(),
-                                                        parameterWithName("kids").description("유아용 변기 유무").optional(),
-                                                        parameterWithName("diaper").description("기저귀 교환대 유무").optional()
-                                                )
-                                                .responseFields(
-                                                        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("총 화장실 갯수"),
-                                                        fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("총 페이지 수"),
-                                                        fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
-                                                        fieldWithPath("data.toiletDtoList[].id").type(JsonFieldType.NUMBER).description("화장실 id"),
-                                                        fieldWithPath("data.toiletDtoList[].name").type(JsonFieldType.STRING).description("화장실 이름"),
-                                                        fieldWithPath("data.toiletDtoList[].road_address").type(JsonFieldType.STRING).description("도로명 주소"),
-                                                        fieldWithPath("data.toiletDtoList[].latitude").type(JsonFieldType.NUMBER).description("화장실 위도"),
-                                                        fieldWithPath("data.toiletDtoList[].longitude").type(JsonFieldType.NUMBER).description("화장실 경도"),
-                                                        fieldWithPath("data.toiletDtoList[].distance").type(JsonFieldType.NUMBER).description("화장실 까지의 거리"),
-                                                        fieldWithPath("data.toiletDtoList[].disabled").type(JsonFieldType.BOOLEAN).description("장애인용 변기 유무"),
-                                                        fieldWithPath("data.toiletDtoList[].kids").type(JsonFieldType.BOOLEAN).description("유아용 변기 유무"),
-                                                        fieldWithPath("data.toiletDtoList[].diaper").type(JsonFieldType.BOOLEAN).description("기저귀 교환대 유무"),
-                                                        fieldWithPath("data.toiletDtoList[].operation_time").type(JsonFieldType.STRING).description("화장실 운영 시간"),
-                                                        fieldWithPath("data.toiletDtoList[].score").type(JsonFieldType.NUMBER).description("화장실 평점"),
-                                                        fieldWithPath("data.toiletDtoList[].scoreCount").type(JsonFieldType.NUMBER).description("평점 갯수"))
-                                                .build())));
     }
 
     @Test
